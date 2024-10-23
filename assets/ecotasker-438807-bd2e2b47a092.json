@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ecotasker-438807",
+  "private_key_id": "bd2e2b47a092fd200421075eae977617177fb240",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCzPDV1q/z5YINV\nqVmh7kN59VHwijPOHrzuFtOtGF/tMVQgkZxgErEkCVDhl9gG14OLmp410/DHW4AO\n1C66KgxBIfKHC+xINIgq9xpwQ4ELFUT0ps7qA+SPWDUqluaZYQv4hvN1+pQxYe/B\nFtO9Vj6m0nhvjP/Gqud4WXDm++mzA1yWqORpXuoHy400/3ijgErIFIXlPRdS26lu\nLvwwdeIfNm+qA6qgxApyRyMBefLw76J5GVFKIN89LJDqyQVe3YLxWD7ofQQUPj5q\nJtRVojFke2H21nrX8S0dVeE/FYbJP/CvqFmX+h1V3LfsdFEmjhUUieRxyfUTSf/4\n+fK1F3TJAgMBAAECggEAEpmP7qsvcG2ck3okjBJevDxCCZU99QjpkEecJd1erw2s\nbkjOEoY+DcBNvWt1hpg81XLxMiLRXM7ZBjDsvHL6nJO6SFtrZL7W1qaX/shyjsTh\nSAY7eLt4r4t20Pmh6o7QoDTY9QhQ8qL4L3B//qkBjWxQBTt7m5FGvg2CEuZXhTUK\ngzOKLEIlSmKsBz2XJFSADte5VjoEBiBtGCkT0vbe05oJ3DmQF+w73mCj3VELQPRT\nJQPNJcj5qYHamuayvgxkZUrmLjLYAl3TTbNzkAzmAq3fwPcWMCY7oaXVburwQqyp\nuBgiEGGQNPptg3mESIkC8CiBazSXBbmpVnDAKckSBQKBgQDnL81Bsic6/5go4Lrf\nwPINB2fA1R4YRv7/+AHVovbgUV8oAZf0hQllgeyIDy4JP3RNOQ4+hMqccFPiyrmx\n+IgVRyuMtE+QW7WvVcVt7+DX5Ci7CUiESNj2NHNGuihB7osngR0qHHNFRGpDehOb\nSB73W9tZogso01tYK5rvUg58qwKBgQDGePYopt59g3DFCJXQLvGZqQtRiwHj037j\ne5ccsGa8c1sVSJttx9n4SrZKeHRRgjhKK7gHrqJuOGgNcVqo7koxyfh4Mc4iyJzS\njRGDxtC+IgkCSjvmGcmqNc6TQ4eOC0RCsqIkDstd+e9Ut/nOv3tLTIVg2iJQPydX\nW8QFNgtsWwKBgQCJOBs5ejfE0f6LjM/+jTRePV3828IwILusTJUyK7ci78luInwB\n+5DXOiWdoHzvqkUqrMnim8jyz81KmI9dril/j62upztucLDHMD6uASpQmjD+ywTK\n175HbFxbx5SrhZ38xar82sQkgfYctPG8QjN3GIN6kS7UfZcDH2an0+mbXwKBgFe/\nfR2mATI+3anPTOUZDCoiqeVobvJ6PFx49OtzNkjVO4ziaA2WUVFMPuIX9V1gFGD+\niUOkOx4+BAsFdc7AY781i4wggQGx7lvMkNTRHtMhGxiPF4J5HkcJuQY00gbEBm7y\nqWsFu3YWHXE4UdLNp8Y307RpXMhb05n08WpYZZ6HAoGBAMk/tuwhdl4ZKS8XV3I8\nOU4fySgFFuu9oEe92eqGfFTrIJON3F02dD5sHKAYS4KQNcBOXTIgoMxf62rWWxk4\noOAAJIiNnPd2sTGpYdUiCuJ3mpT8XxV80jjCWLyazu+GwDMIpKvHnBULe3sgJG79\n32bGzUEzjbrh73wZX6caE3Lh\n-----END PRIVATE KEY-----\n",
+  "client_email": "ecotasker@ecotasker-438807.iam.gserviceaccount.com",
+  "client_id": "100791136130288186362",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ecotasker%40ecotasker-438807.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
