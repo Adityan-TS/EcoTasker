@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   google_fonts: ^6.2.1
   supabase_flutter: ^2.5.7
+  flutter_svg: ^2.0.11
   supabase: ^2.2.3
   shared_preferences: ^2.2.3
   flutter_gemini: ^2.0.5
@@ -67,6 +68,13 @@ dev_dependencies:
 flutter:
   assets:
     - assets/ecotasker-438807-bd2e2b47a092.json
+    - assets/images/BMI.png
+    - assets/images/Carbon.png
+    - assets/images/Food.png
+    - assets/images/Business.png
+    - assets/images/Waste.png
+    - assets/images/Sustainable.png
+    - assets/icons/smart_toy.svg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

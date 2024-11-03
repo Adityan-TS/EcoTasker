@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert'; // Needed for jsonDecode
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -273,9 +274,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _studentEmailController = TextEditingController(); // Controller for student's email
+  final _studentEmailController = TextEditingController();
 
-  String selectedRole = 'Student'; // Default role is 'Student'
+  String selectedRole = 'Student';
 
   @override
   void dispose() {
@@ -292,20 +293,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen
+            Navigator.pop(context);
           },
         ),
         title: Text(
-          'Sign Up',
-          style: GoogleFonts.poppins(), // Poppins font for app bar title
+          '',
+          style: GoogleFonts.poppins(),
         ),
-        backgroundColor: Colors.white, // Set app bar background color to white
+        backgroundColor: Colors.white,
       ),
-      backgroundColor: Colors.white, // Set scaffold background color to white
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0).add(
-          const EdgeInsets.only(top: 25.0), // Add padding at the top
-        ),
+        padding: const EdgeInsets.all(16.0).add(const EdgeInsets.only(top: 25.0)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -337,8 +336,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hintStyle: const TextStyle(color: Colors.grey),
                       fillColor: const Color(0xFFf1f5f9),
                       filled: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 12.0),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: BorderSide.none,
@@ -349,8 +347,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email address';
                       }
-                      if (!RegExp(r'^[^@]+@[^@]+\.[a-zA-Z]{2,}$')
-                          .hasMatch(value)) {
+                      if (!RegExp(r'^[^@]+@[^@]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
                         return 'Please enter a valid email address';
                       }
                       return null;
@@ -364,8 +361,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hintStyle: const TextStyle(color: Colors.grey),
                       fillColor: const Color(0xFFf1f5f9),
                       filled: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 12.0),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: BorderSide.none,
@@ -385,7 +381,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Show Student's Email field if "Parent" is selected
                   if (selectedRole == 'Parent')
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,8 +392,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             hintStyle: const TextStyle(color: Colors.grey),
                             fillColor: const Color(0xFFf1f5f9),
                             filled: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16.0, horizontal: 12.0),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                               borderSide: BorderSide.none,
@@ -406,13 +400,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           style: GoogleFonts.poppins(),
                           validator: (value) {
-                            if (selectedRole == 'Parent' &&
-                                (value == null || value.isEmpty)) {
+                            if (selectedRole == 'Parent' && (value == null || value.isEmpty)) {
                               return 'Please enter the student\'s email address';
                             }
-                            if (selectedRole == 'Parent' &&
-                                !RegExp(r'^[^@]+@[^@]+\.[a-zA-Z]{2,}$')
-                                    .hasMatch(value!)) {
+                            if (selectedRole == 'Parent' && !RegExp(r'^[^@]+@[^@]+\.[a-zA-Z]{2,}$').hasMatch(value!)) {
                               return 'Please enter a valid student email address';
                             }
                             return null;
@@ -422,7 +413,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ],
                     ),
 
-                  // Role selection with toggle buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -437,9 +427,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 15),
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: selectedRole == 'Student'
-                                  ? Colors.black
-                                  : Colors.grey.shade200,
+                              color: selectedRole == 'Student' ? Colors.black : Colors.grey.shade200,
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(10),
                                 bottomLeft: Radius.circular(10),
@@ -448,9 +436,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: Text(
                               'Student',
                               style: GoogleFonts.poppins(
-                                color: selectedRole == 'Student'
-                                    ? Colors.white
-                                    : Colors.black,
+                                color: selectedRole == 'Student' ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -468,20 +454,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 15),
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: selectedRole == 'Parent'
-                                  ? Colors.black
-                                  : Colors.grey.shade200,
+                              color: selectedRole == 'Parent' ? Colors.black : Colors.grey.shade200,
+                            ),
+                            child: Text(
+                              'Parent',
+                              style: GoogleFonts.poppins(
+                                color: selectedRole == 'Parent' ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedRole = 'Eco Explorer';
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: selectedRole == 'Eco Explorer' ? Colors.black : Colors.grey.shade200,
                               borderRadius: const BorderRadius.only(
                                 topRight: Radius.circular(10),
                                 bottomRight: Radius.circular(10),
                               ),
                             ),
                             child: Text(
-                              'Parent',
+                              'Eco Explorer',
                               style: GoogleFonts.poppins(
-                                color: selectedRole == 'Parent'
-                                    ? Colors.white
-                                    : Colors.black,
+                                color: selectedRole == 'Eco Explorer' ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -499,58 +504,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         final password = _passwordController.text.trim();
                         final studentEmail = _studentEmailController.text.trim();
 
-                        // Perform the signup process
                         try {
                           final response = await widget.supabaseClient.auth
                               .signUp(email: email, password: password);
 
-                          // Check if signup was successful
                           if (response.user != null) {
-                            // Insert the new user details into the Users table
                             final role = selectedRole;
                             await widget.supabaseClient.from('Users').insert({
-                              'Email ID': email, // Column A
-                              'Type': role, // Column B
-                              'StudentEmail': role == 'Parent' ? studentEmail : null, // Column C
+                              'Email ID': email,
+                              'Type': role,
+                              'StudentEmail': role == 'Parent' ? studentEmail : null,
                             });
 
-                            // Insert initial score into the Scores table only if the user is a Student
                             if (role == 'Student') {
                               await widget.supabaseClient.from('Scores').insert({
-                                'Email ID': email, // Column A
-                                'Score': 0, // Column B
+                                'Email ID': email,
+                                'Score': 0,
                               });
                             }
 
-                            Navigator.pop(context); // Navigate back on successful sign up
-                          } else {
-                            // No error handling, as per your request
+                            Navigator.pop(context);
                           }
                         } catch (e) {
-                          // Handle any exceptions that occur during signup
                           _showErrorDialog('An error occurred: $e');
                         }
                       }
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all<Size>(
-                          const Size(double.infinity, 50)), // Full width button
+                          const Size(double.infinity, 50)),
                       backgroundColor: MaterialStateProperty.all<Color>(
-                          const Color(0xFF1A1A1A)), // Black background color
+                          const Color(0xFF1A1A1A)),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0), // Rounded corners
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
                     ),
                     child: Container(
                       alignment: Alignment.center,
-                      height: 55, // Set a fixed height for consistency
+                      height: 55,
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white, // White text color
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -564,7 +562,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // Function to show error dialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -575,7 +572,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('OK'),
             ),
@@ -585,6 +582,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
+
 class LoginScreen extends StatefulWidget {
   final SupabaseClient supabaseClient;
 
@@ -726,59 +724,66 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        final email = _emailController.text.trim();
-                        final password = _passwordController.text.trim();
+  onPressed: () async {
+    if (_formKey.currentState!.validate()) {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
 
-                        try {
-                          // Perform login
-                          final response = await widget.supabaseClient.auth.signInWithPassword(
-                            email: email,
-                            password: password,
-                          );
+      try {
+        // Perform login
+        final response = await widget.supabaseClient.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
 
-                          if (response.user != null) {
-                            storeUserEmailLocally(email); // Store email locally
+        if (response.user != null) {
+          storeUserEmailLocally(email); // Store email locally
 
-                            // Fetch user type and student email using the entered email
-                            Map<String, dynamic>? userDetails = await fetchUserDetails(email);
-                            if (userDetails != null) {
-                              String userType = userDetails['Type'];
-                              String? studentEmail = userDetails['StudentEmail'];
+          // Fetch user type and student email using the entered email
+          Map<String, dynamic>? userDetails = await fetchUserDetails(email);
+          if (userDetails != null) {
+            String userType = userDetails['Type'];
+            String? studentEmail = userDetails['StudentEmail'];
 
-                              if (userType == 'Parent') {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ParentDashboard(title: '', parentEmail: email),
-                                  ),
-                                );
-                              } else {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MyHomePage(title: ''),
-                                  ),
-                                );
-                              }
-                            } else {
-                              setState(() {
-                                _loginError = 'User details not found. Please try again.';
-                              });
-                            }
-                          } else {
-                            setState(() {
-                              _loginError = 'Email and password don\'t match. Please try again.';
-                            });
-                          }
-                        } on AuthApiException catch (e) {
-                          setState(() {
-                            _loginError = e.message; // Display specific auth error message
-                          });
-                        }
-                      }
-                    },
+            if (userType == 'Parent') {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ParentDashboard(title: '', parentEmail: email),
+                ),
+              );
+            } else if (userType == 'Eco Explorer') {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EcoExplorerScreen(),
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: ''),
+                ),
+              );
+            }
+          } else {
+            setState(() {
+              _loginError = 'User details not found. Please try again.';
+            });
+          }
+        } else {
+          setState(() {
+            _loginError = 'Email and password don\'t match. Please try again.';
+          });
+        }
+      } on AuthApiException catch (e) {
+        setState(() {
+          _loginError = e.message; // Display specific auth error message
+        });
+      }
+    }
+  },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 50)),
                       backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF1A1A1A)),
@@ -842,6 +847,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+
 class MyHomePage extends StatefulWidget {
   final String title;
 
@@ -852,12 +858,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String userEmail = ''; // Full email
-  String userEmailPrefix = ''; // Display prefix
+  String userEmail = '';
+  String userEmailPrefix = '';
   int userScore = 0;
   double _rotation = 0;
   List<Map<String, dynamic>> events = [];
-  List<String> requestedTasks = [];
+  List<Map<String, dynamic>> requestedTasks = [];
   DateTime? lastFetchDate;
 
   @override
@@ -873,27 +879,13 @@ class _MyHomePageState extends State<MyHomePage> {
       userEmail = email ?? '';
       userEmailPrefix = email != null ? email.split('@').first : '';
     });
-    _fetchUserScore(userEmail);
+    await _fetchUserScore(userEmail);
     await _checkForTaskRefresh();
-    await _loadRequestedTasks(); // Load previously requested tasks
-  }
-
-  Future<void> _loadRequestedTasks() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedRequestedTasks = prefs.getString('requestedTasks');
-    if (storedRequestedTasks != null) {
-      requestedTasks = List<String>.from(jsonDecode(storedRequestedTasks));
-      // Update event statuses based on requested tasks
-      for (var event in events) {
-        if (requestedTasks.contains(event['title'])) {
-          event['status'] = 'Requested'; // Update status to 'Requested'
-        }
-      }
-    }
+    await _fetchRequestedTasks();
   }
 
   Future<void> _fetchUserScore(String? email) async {
-    if (email != null) {
+    if (email != null && email.isNotEmpty) {
       final response = await Supabase.instance.client
           .from('Scores')
           .select('Score')
@@ -905,7 +897,33 @@ class _MyHomePageState extends State<MyHomePage> {
           userScore = response['Score'];
         });
       } else {
-        print('Failed to fetch user score.');
+        setState(() {
+          userScore = 0;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchRequestedTasks() async {
+    if (userEmail.isNotEmpty) {
+      try {
+        final response = await Supabase.instance.client
+            .from('Requests')
+            .select('Task, Status')
+            .eq('StudentEmail', userEmail);
+
+        if (response != null && response is List) {
+          setState(() {
+            requestedTasks = List<Map<String, dynamic>>.from(response.map((task) {
+              return {
+                'task': task['Task'] ?? 'Unknown Task',
+                'status': task['Status'] ?? 'Unknown Status',
+              };
+            }));
+          });
+        }
+      } catch (error) {
+        print("Supabase fetch error: $error");
       }
     }
   }
@@ -926,67 +944,50 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _fetchTasksFromOpenRouter() async {
     const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
-    final apiKey = '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';
+    const apiKey = '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';
 
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Authorization': 'Bearer $apiKey',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'model': 'liquid/lfm-40b',
-          'messages': [
-            {
-              'role': 'A Task Generator That Generates Exactly 5 Tasks in A List that is numbered without any extra spaces or extra lines,The Tasks Must Be UAE Appropriate',
-              'content': 'Generate EXACTLY 5 tasks which encourages 5-10 year olds to do something eco-friendly in a list preferably supporting SDG 13. Don\'t type any responses apart from the list. Don\'t give any text before or after the list. It should not be numbered. It should be less than 7 words and must be completable in max 30 mins. Eg: Turn off lights when they aren\'t used, go around the house looking for electronic appliances that aren\'t used and unplug them. Must be sensible or something preferably done at home. THIS RESPONSE IS PARSED TO A MOBILE APPLICATION THAT ONLY ACCEPTS THE FORMAT OF A LIST WITH NO EXTRA TEXT.',
-            },
-          ],
-        }),
-      );
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Authorization': 'Bearer $apiKey',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'model': 'liquid/lfm-40b:free',
+        'messages': [
+          {
+            'role': 'A Task Generator That Generates Exactly 5 Tasks in A List that is numbered without any extra spaces or extra lines, The Tasks Must Be UAE Appropriate',
+            'content': 'Generate EXACTLY 5 tasks which encourage 5-10 year olds to do something eco-friendly in a list preferably supporting SDG 13.',
+          },
+        ],
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        String taskString = data['choices'][0]['message']['content'];
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      String taskString = data['choices'][0]['message']['content'];
 
-        List<String> taskList = taskString.split('\n').map((task) => task.trim()).toList();
+      List<String> taskList = taskString.split('\n').map((task) => task.trim()).toList();
 
-        setState(() {
-          events = List.generate(taskList.length, (index) {
-            return {
-              'title': taskList[index],
-              'status': 'Not Done',
-            };
-          });
+      setState(() {
+        events = List.generate(taskList.length, (index) {
+          return {
+            'title': taskList[index],
+            'status': 'Not Done',
+          };
         });
+      });
 
-        // Store the tasks and current date in Shared Preferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('tasks', jsonEncode(events));
-        await prefs.setString('lastFetchDate', DateFormat('yyyy-MM-dd').format(DateTime.now()));
-      } else {
-        print('Failed to fetch tasks: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error fetching tasks: $error');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('tasks', jsonEncode(events));
+      await prefs.setString('lastFetchDate', DateFormat('yyyy-MM-dd').format(DateTime.now()));
     }
   }
 
-    Future<void> _saveTaskToRequests(String email, String task) async {
-    try {
-      final response = await Supabase.instance.client
-          .from('Requests')
-          .insert({'StudentEmail': email, 'Task': task, 'Status': 'Requested'});
-
-      if (response.error == null) {
-        print('Task successfully saved to Requests.');
-      } else {
-        print('Failed to save task: ${response.error!.message}');
-      }
-    } catch (error) {
-      print('Error saving task to Requests: $error');
-    }
+  Future<void> _saveTaskToRequests(String email, String task) async {
+    await Supabase.instance.client
+        .from('Requests')
+        .insert({'StudentEmail': email, 'Task': task, 'Status': 'Requested'});
   }
 
   void _refreshData() {
@@ -1006,16 +1007,15 @@ class _MyHomePageState extends State<MyHomePage> {
   void _toggleEventStatus(int index) {
     setState(() {
       if (events[index]['status'] == 'Not Done') {
-        _sendRequest(events[index]['title'], userEmail); // Use full email here
+        _sendRequest(events[index]['title'], userEmail);
         events[index]['status'] = 'Requested';
-        requestedTasks.add(events[index]['title']);
-        _saveRequestedTasks();
+        _saveRequestedTasks(events[index]['title']);
       }
     });
   }
 
   Future<void> _sendRequest(String task, String studentEmail) async {
-    final response = await Supabase.instance.client
+    await Supabase.instance.client
         .from('Requests')
         .insert({
           'StudentEmail': studentEmail,
@@ -1024,9 +1024,12 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  Future<void> _saveRequestedTasks() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('requestedTasks', jsonEncode(requestedTasks));
+  Future<void> _saveRequestedTasks(String task) async {
+    requestedTasks.add({
+      'task': task,
+      'status': 'Requested',
+    });
+    await _fetchRequestedTasks();
   }
 
   void _removeTask(String task) {
@@ -1071,98 +1074,315 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _refreshData();
-        },
-        backgroundColor: const Color(0xFF1A1A1A),
-        child: AnimatedRotation(
-          turns: _rotation / 360,
-          duration: const Duration(milliseconds: 300),
-          child: const Icon(
-            Icons.refresh,
-            color: Colors.white,
+      floatingActionButton: Stack(
+        children: [
+          Positioned(
+            bottom: 16,
+            left: 25,
+            child: FloatingActionButton(
+              onPressed: _openHistoryBottomSheet,
+              backgroundColor: const Color(0xFF1A1A1A),
+              child: const Icon(Icons.history, color: Colors.white),
+            ),
           ),
-        ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: _refreshData,
+              backgroundColor: const Color(0xFF1A1A1A),
+              child: AnimatedRotation(
+                turns: _rotation / 360,
+                duration: const Duration(milliseconds: 300),
+                child: const Icon(Icons.refresh, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
   Widget _buildEventCard(int index) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      color: const Color(0xFF1A1A1A),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    events[index]['title'],
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+  return Card(
+    margin: const EdgeInsets.symmetric(vertical: 8.0),
+    color: const Color(0xFF1A1A1A),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  events[index]['title'] ?? 'No Title',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  events[index]['status'] ?? 'Unknown',
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          Column( // Stack icons vertically
+            children: [
+              IconButton(
+                icon: const Icon(Icons.check, color: Colors.white),
+                onPressed: () {
+                  _toggleEventStatus(index);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.chat, color: Colors.white),
+                onPressed: () {
+                  _openChatSheet(context, events[index]['title'] ?? 'No Title');
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+void _openChatSheet(BuildContext context, String task) {
+  List<String> chatMessages = [];
+  TextEditingController chatInputController = TextEditingController();
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            height: MediaQuery.of(context).size.height * 0.5,
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Chat about "$task"',
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: chatMessages.length,
+                    itemBuilder: (context, index) {
+                      bool isUserMessage = chatMessages[index].startsWith('You:');
+                      return ListTile(
+                        title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (isUserMessage)
+                              Icon(Icons.person, color: Colors.blue, size: 24)
+                            else
+                              Icon(Icons.smart_toy, color: Colors.green, size: 24),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                chatMessages[index].substring(4), // Removes "You:" or "AI:"
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${events[index]['status']}',
-                    style: const TextStyle(color: Colors.grey),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: chatInputController,
+                        decoration: const InputDecoration(
+                          hintText: 'Type your message...',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: () async {
+                        String userInput = chatInputController.text;
+                        if (userInput.isNotEmpty) {
+                          setState(() {
+                            chatMessages.add('You: $userInput');
+                          });
+
+                          String response = await _getChatResponse(userInput, task); // Pass task here
+                          setState(() {
+                            chatMessages.add('AI: $response');
+                          });
+
+                          chatInputController.clear();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+// Modify _getChatResponse to accept task as a parameter
+Future<String> _getChatResponse(String query, String task) async {
+  const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+  const apiKey = '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'; // Replace with actual API key
+
+  final response = await http.post(
+    Uri.parse(apiUrl),
+    headers: {
+      'Authorization': 'Bearer $apiKey',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'model': 'liquid/lfm-40b:free',
+      'messages': [
+        {
+          'role': 'system',
+          'content': 'You are a helpful assistant providing insights and suggestions about the task: $task.'
+        },
+        {
+          'role': 'user',
+          'content': query,
+        },
+      ],
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['choices'][0]['message']['content'];
+  } else {
+    return 'Error fetching response. Please try again later.';
+  }
+}
+
+  Widget _buildScoreBox() {
+  return GestureDetector(
+    onTap: () {
+      // Navigate to the Leaderboard screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LeaderboardScreen()),
+      );
+    },
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.star,
+            color: Colors.white,
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$userScore',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+void _navigateToLeaderboard() {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => LeaderboardScreen()), // Replace LeaderboardScreen with your actual leaderboard screen widget
+  );
+}
+
+  void _openHistoryBottomSheet() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(20),
+      ),
+    ),
+    builder: (context) {
+      return DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.9, // Takes up 80% of the screen height
+        minChildSize: 0.6,
+        maxChildSize: 1.0,
+        builder: (context, scrollController) {
+          return ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Center(
+                    child: Text(
+                      'History',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController, // Attach controller here
+                      itemCount: requestedTasks.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          color: const Color(0xFF1A1A1A),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ListTile(
+                            title: Text(
+                              requestedTasks[index]['task'] ?? '',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            subtitle: Text(
+                              requestedTasks[index]['status'] ?? '',
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.check_box, color: Colors.white),
-              onPressed: () {
-                _toggleEventStatus(index);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScoreBox() {
-    return GestureDetector(
-      onTap: _openLeaderboard, // Open leaderboard on tap
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.star,
-              color: Colors.white,
-              size: 16,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '$userScore points',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _openLeaderboard() {
-    // Open leaderboard screen
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LeaderboardScreen()),
-    );
-  }
+          );
+        },
+      );
+    },
+  );
+}
 }
 
 class LeaderboardScreen extends StatelessWidget {
@@ -1175,7 +1395,7 @@ class LeaderboardScreen extends StatelessWidget {
 
     List<Map<String, dynamic>> leaderboardData = [];
 
-    if (response != null && response.isNotEmpty) {
+    if (response.isNotEmpty) {
       for (var row in response) {
         leaderboardData.add({
           'email': row['Email ID'],
@@ -1295,7 +1515,7 @@ class LeaderboardScreen extends StatelessWidget {
 // Define the ParentDashboard class (ALFIE YOU DO YOU)
 class ParentDashboard extends StatefulWidget {
   final String title;
-  final String parentEmail; // Add parentEmail as a parameter
+  final String parentEmail;
 
   const ParentDashboard({Key? key, required this.title, required this.parentEmail}) : super(key: key);
 
@@ -1304,36 +1524,33 @@ class ParentDashboard extends StatefulWidget {
 }
 
 class _ParentDashboardState extends State<ParentDashboard> {
-  String childEmail = ''; // Email of the child
+  String childEmail = '';
   String childEmailPrefix = '';
   int childScore = 0;
   double _rotation = 0;
   List<Map<String, dynamic>> taskRequests = [];
+  int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // Use the parent's email passed from the login screen
     _fetchChildEmail(widget.parentEmail);
   }
 
-  // Fetch child's email using the parent's email
   Future<void> _fetchChildEmail(String? parentEmail) async {
     if (parentEmail != null && parentEmail.isNotEmpty) {
       try {
         final response = await Supabase.instance.client
-            .from('Users') // Assuming Users is your table name
-            .select('StudentEmail') // Change 'childEmail' to your actual column name for child's email
-            .eq('Email ID', parentEmail) // Use the parent's email here
+            .from('Users')
+            .select('StudentEmail')
+            .eq('Email ID', parentEmail)
             .single();
 
         if (response != null && response['StudentEmail'] != null) {
           setState(() {
-            childEmail = response['StudentEmail']; // Update the child's email
-            childEmailPrefix = childEmail.split('@').first; // Display child's email prefix
+            childEmail = response['StudentEmail'];
+            childEmailPrefix = childEmail.split('@').first;
           });
-
-          // Fetch the child's score and task requests after fetching the child email
           _fetchChildScore(childEmail);
           await _fetchTaskRequests();
         } else {
@@ -1347,19 +1564,18 @@ class _ParentDashboardState extends State<ParentDashboard> {
     }
   }
 
-  // Fetch child's score using the child's email
   Future<void> _fetchChildScore(String? email) async {
     if (email != null && email.isNotEmpty) {
       try {
         final response = await Supabase.instance.client
             .from('Scores')
             .select('Score')
-            .eq('Email ID', email) // Use the child's email here
+            .eq('Email ID', email)
             .single();
 
         if (response != null && response['Score'] != null) {
           setState(() {
-            childScore = response['Score']; // Update the child's score
+            childScore = response['Score'];
           });
         } else {
           print('No score found for the provided child email.');
@@ -1372,34 +1588,31 @@ class _ParentDashboardState extends State<ParentDashboard> {
     }
   }
 
-  // Fetch task requests for the child
   Future<void> _fetchTaskRequests() async {
-  if (childEmail.isNotEmpty) {
-    try {
-      final response = await Supabase.instance.client
-          .from('Requests')
-          .select()
-          .eq('StudentEmail', childEmail)  // Use the child's email
-          .eq('Status', 'Requested');  // Fetch only tasks with status 'Requested'
+    if (childEmail.isNotEmpty) {
+      try {
+        final response = await Supabase.instance.client
+            .from('Requests')
+            .select()
+            .eq('StudentEmail', childEmail)
+            .eq('Status', 'Requested');
 
-      if (response != null) {
-        setState(() {
-          taskRequests = List<Map<String, dynamic>>.from(response);
-        });
+        if (response != null) {
+          setState(() {
+            taskRequests = List<Map<String, dynamic>>.from(response);
+          });
+        }
+      } catch (error) {
+        print('Error fetching task requests: $error');
       }
-    } catch (error) {
-      print('Error fetching task requests: $error');
     }
   }
-}
 
-  // Refresh task requests
   void _refreshData() {
     setState(() {
       _rotation += 45;
     });
 
-    // Refresh the task requests
     _fetchTaskRequests();
 
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -1409,25 +1622,16 @@ class _ParentDashboardState extends State<ParentDashboard> {
     });
   }
 
-  // Approve the task and update the score
-// Approve the task and update the score
-void _approveTask(int index) async {
-  final taskId = taskRequests[index]['id']; // Get the task ID
+  void _approveTask(int index) async {
+    final taskId = taskRequests[index]['id'];
+    await _updateTaskStatus(taskId, 'Approved');
+    await _incrementChildScore();
 
-  // Update the task status in the database
-  await _updateTaskStatus(taskId, 'Approved');
+    setState(() {
+      taskRequests.removeAt(index);
+    });
+  }
 
-  // Increment the child's score after task approval
-  await _incrementChildScore();
-
-  // Remove the task from the list after approval
-  setState(() {
-    taskRequests.removeAt(index);
-  });
-}
-
-
-  // Update task status in the database
   Future<void> _updateTaskStatus(int taskId, String status) async {
     try {
       await Supabase.instance.client
@@ -1439,7 +1643,6 @@ void _approveTask(int index) async {
     }
   }
 
-  // Increment child's score
   Future<void> _incrementChildScore() async {
     setState(() {
       childScore += 10;
@@ -1453,6 +1656,98 @@ void _approveTask(int index) async {
     } catch (error) {
       print('Error updating child score: $error');
     }
+  }
+
+  void _rejectTask(int index) async {
+    final taskId = taskRequests[index]['id'];
+    await _updateTaskStatus(taskId, 'Rejected');
+
+    setState(() {
+      taskRequests.removeAt(index);
+    });
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 1) {
+      Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EcoExplorerScreen(showNavBar: true), // Pass showNavBar as true
+      ),
+    );
+  }
+}
+
+  Widget _buildScoreBox() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.star, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            '$childScore',
+            style: const TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskRequestCard(int index) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      color: const Color(0xFF1A1A1A),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    taskRequests[index]['Task'],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    taskRequests[index]['Status'],
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.check_box, color: Colors.white),
+                  onPressed: taskRequests[index]['Status'] == 'Requested'
+                      ? () => _approveTask(index)
+                      : null,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => _rejectTask(index),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -1504,92 +1799,1016 @@ void _approveTask(int index) async {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Eco Explorer',
+          ),
+        ],
+      ),
     );
   }
+}
+class EcoExplorerScreen extends StatefulWidget {
+  final bool showNavBar;
 
-  // Build each task request card
-  // Build each task request card
-Widget _buildTaskRequestCard(int index) {
-  return Card(
-    margin: const EdgeInsets.symmetric(vertical: 8.0),
-    color: const Color(0xFF1A1A1A),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  taskRequests[index]['Task'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  taskRequests[index]['Status'],
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
+  const EcoExplorerScreen({Key? key, this.showNavBar = false}) : super(key: key);
+
+  @override
+  _EcoExplorerScreenState createState() => _EcoExplorerScreenState();
+}
+
+class _EcoExplorerScreenState extends State<EcoExplorerScreen> {
+  double age = 1;
+  double weight = 1;
+  double height = 50;
+  double commuteDistance = 0.0;
+  double electricityConsumption = 0.0;
+  double wasteGenerated = 0.0;
+  double mealsPerDay = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2E7D6A),
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: const Text(
+            'Hi, EcoExplorer',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
             ),
           ),
-          Row(
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(
-                icon: const Icon(Icons.check_box, color: Colors.white),
-                onPressed: taskRequests[index]['Status'] == 'Requested'
-                    ? () => _approveTask(index)
-                    : null,
+              Center(
+                child: const Text(
+                  'Eco Achievers',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: () => _rejectTask(index), // Call the reject function
+              const SizedBox(height: 24),
+              GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 0.8,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _buildCard(
+                    context,
+                    title: 'BMI Calculator',
+                    imagePath: 'assets/images/BMI.png',
+                    bgColor: const Color(0xFF5BC0EB),
+                    onTap: () => _showBMICalculator(context),
+                  ),
+                  _buildCard(
+                    context,
+                    title: 'Carbon Footprint Tracker',
+                    imagePath: 'assets/images/Carbon.png',
+                    bgColor: const Color(0xFFB7E036),
+                    onTap: () => _showCarbonFootprintTracker(context),
+                  ),
+                  _buildCard(
+                    context,
+                    title: 'Food Guide',
+                    imagePath: 'assets/images/Food.png',
+                    bgColor: const Color(0xFFB5651D),
+                    onTap: () => _showFoodGuide(context),
+                  ),
+                  _buildCard(
+                    context,
+                    title: 'Business Directory',
+                    imagePath: 'assets/images/Business.png',
+                    bgColor: const Color(0xFF5BC0EB),
+                    onTap: () => _showBusinessDirectory(context),
+                  ),
+                  _buildCard(
+                    context,
+                    title: 'Waste Guide',
+                    imagePath: 'assets/images/Waste.png',
+                    bgColor: const Color(0xFF70C1B3),
+                    onTap: () => _showWasteGuide(context),
+                  ),
+                  _buildCard(
+                    context,
+                    title: 'Sustainable Bot',
+                    imagePath: 'assets/images/Sustainable.png',
+                    bgColor: const Color(0xFF70C1B3),
+                    onTap: () => _showSustainableBot(context),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
-    ),
-  );
-}
+      bottomNavigationBar: widget.showNavBar // Display bottom nav bar only if showNavBar is true
+          ? BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.explore),
+                  label: 'Eco Explorer',
+                ),
+              ],
+              selectedItemColor: Colors.grey,
+              onTap: (index) {
+                if (index == 0) {
+                  Navigator.pop(context); // Navigate back to the Parent Dashboard
+                }
+                // Add additional actions if needed for the Eco Explorer tab
+              },
+            )
+          : null, // No bottom nav bar if showNavBar is false
+    );
+  }
 
-
-// Reject the task and update the UI
-void _rejectTask(int index) async {
-  final taskId = taskRequests[index]['id']; // Get the task ID
-
-  // Update the database to change the status to 'Rejected'
-  await _updateTaskStatus(taskId, 'Rejected');
-
-  // Remove the task from the list after rejection
-  setState(() {
-    taskRequests.removeAt(index);
-  });
-}
-
-
-  // Build the score box displaying the child's score
-  Widget _buildScoreBox() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.star, color: Colors.white),
-          const SizedBox(width: 8),
-          Text(
-            '$childScore',
-            style: const TextStyle(color: Colors.white),
-          ),
-        ],
+  Widget _buildCard(BuildContext context,
+      {required String title, required String imagePath, required Color bgColor, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 2,
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                Container(
+                  height: 100,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                    child: Image.asset(
+                      imagePath,
+                      height: 100,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.favorite_border,
+                      color: Colors.grey,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+
+  void _showBMICalculator(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: EdgeInsets.all(16),
+              color: Colors.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'BMI Calculator',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  Text('Age: ${age.toInt()} years'),
+                  Slider(
+                    value: age,
+                    min: 1,
+                    max: 100,
+                    divisions: 99,
+                    label: age.toInt().toString(),
+                    activeColor: Color(0xFF227C70),
+                    onChanged: (value) {
+                      setState(() {
+                        age = value;
+                      });
+                    },
+                  ),
+                  Text('Weight: ${weight.toInt()} kg'),
+                  Slider(
+                    value: weight,
+                    min: 1,
+                    max: 200,
+                    divisions: 199,
+                    label: weight.toInt().toString(),
+                    activeColor: Color(0xFF227C70),
+                    onChanged: (value) {
+                      setState(() {
+                        weight = value;
+                      });
+                    },
+                  ),
+                  Text('Height: ${height.toInt()} cm'),
+                  Slider(
+                    value: height,
+                    min: 50,
+                    max: 250,
+                    divisions: 200,
+                    label: height.toInt().toString(),
+                    activeColor: Color(0xFF227C70),
+                    onChanged: (value) {
+                      setState(() {
+                        height = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF227C70),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      double bmi = weight / ((height / 100) * (height / 100));
+                      String category;
+
+                      if (bmi < 18.5) {
+                        category = 'Underweight';
+                      } else if (bmi < 24.9) {
+                        category = 'Normal weight';
+                      } else if (bmi < 29.9) {
+                        category = 'Overweight';
+                      } else if (bmi < 39.9) {
+                        category = 'Obese';
+                      } else {
+                        category = 'Extremely Obese';
+                      }
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Your BMI'),
+                            content: Text('Your BMI is ${bmi.toStringAsFixed(2)}\nCategory: $category'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Text('Calculate'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showCarbonFootprintTracker(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return Container(
+            padding: EdgeInsets.all(16),
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Carbon Footprint Tracker',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+
+                // Daily Commute Distance Input
+                Text('Daily Commute Distance (in km): ${commuteDistance.toStringAsFixed(2)}'),
+                Slider(
+                  value: commuteDistance,
+                  min: 0,
+                  max: 100,
+                  divisions: 100,
+                  label: commuteDistance.toStringAsFixed(2),
+                  activeColor: Color(0xFF227C70),
+                  onChanged: (value) {
+                    setState(() {
+                      commuteDistance = value;
+                    });
+                  },
+                ),
+
+                // Weekly Waste Generated Input
+                Text('Waste Generated per Week (in kg): ${wasteGenerated.toStringAsFixed(2)}'),
+                Slider(
+                  value: wasteGenerated,
+                  min: 0,
+                  max: 50,
+                  divisions: 100,
+                  label: wasteGenerated.toStringAsFixed(2),
+                  activeColor: Color(0xFF227C70),
+                  onChanged: (value) {
+                    setState(() {
+                      wasteGenerated = value;
+                    });
+                  },
+                ),
+
+                // Monthly Electricity Consumption Input
+                Text('Monthly Electricity Consumption (in kWh): ${electricityConsumption.toStringAsFixed(2)}'),
+                Slider(
+                  value: electricityConsumption,
+                  min: 0,
+                  max: 1000,
+                  divisions: 100,
+                  label: electricityConsumption.toStringAsFixed(2),
+                  activeColor: Color(0xFF227C70),
+                  onChanged: (value) {
+                    setState(() {
+                      electricityConsumption = value;
+                    });
+                  },
+                ),
+
+                // Meals Consumed per Day Input
+                Text('Meals Consumed per Day: ${mealsPerDay.toStringAsFixed(2)}'),
+                Slider(
+                  value: mealsPerDay,
+                  min: 0,
+                  max: 10,
+                  divisions: 10,
+                  label: mealsPerDay.toStringAsFixed(2),
+                  activeColor: Color(0xFF227C70),
+                  onChanged: (value) {
+                    setState(() {
+                      mealsPerDay = value;
+                    });
+                  },
+                ),
+                SizedBox(height: 20),
+                
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF227C70),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    // Annual carbon footprint calculations in kg
+                    double commuteFootprint = commuteDistance * 365 * 0.404; // in kg
+                    double wasteFootprint = wasteGenerated * 52 * 1.0; // in kg
+                    double electricityFootprint = electricityConsumption * 12 * 0.5; // in kg
+                    double mealsFootprint = mealsPerDay * 365 * 0.75; // in kg
+                    
+                    // Convert each footprint to tonnes
+                    double commuteTonnes = commuteFootprint / 1000;
+                    double wasteTonnes = wasteFootprint / 1000;
+                    double electricityTonnes = electricityFootprint / 1000;
+                    double mealsTonnes = mealsFootprint / 1000;
+
+                    // Total carbon footprint in tonnes per year
+                    double totalFootprint = commuteTonnes + wasteTonnes + electricityTonnes + mealsTonnes;
+
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Your Annual Carbon Footprint Breakdown'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Commute: ${commuteTonnes.toStringAsFixed(2)} tonnes CO2/year'),
+                              Text('Waste: ${wasteTonnes.toStringAsFixed(2)} tonnes CO2/year'),
+                              Text('Electricity: ${electricityTonnes.toStringAsFixed(2)} tonnes CO2/year'),
+                              Text('Meals: ${mealsTonnes.toStringAsFixed(2)} tonnes CO2/year'),
+                              SizedBox(height: 10),
+                              Text('Total: ${totalFootprint.toStringAsFixed(2)} tonnes CO2/year'),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Text('Calculate'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
 }
+}
+
+void _showWasteGuide(BuildContext context) {
+  List<String> chatMessages = []; // Moved outside to retain state
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          TextEditingController wasteInputController = TextEditingController();
+
+          return Container(
+            padding: EdgeInsets.all(16),
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Waste Guide',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: chatMessages.length,
+                    itemBuilder: (context, index) {
+                      // Determine whether to show user or AI icon based on message
+                      bool isUserMessage = chatMessages[index].startsWith('You:');
+                      return ListTile(
+                        title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Check if the message is from the user or the AI
+                            if (isUserMessage)
+                              Icon(
+                                Icons.person,
+                                color: Colors.red,
+                                size: 24,
+                              )
+                            else
+                              SvgPicture.asset(
+                                'assets/icons/smart_toy.svg', // Path to your SVG icon for AI
+                                width: 24,
+                                height: 24,
+                              ),
+                            SizedBox(width: 8), // Spacing between icon and text
+                            Expanded(
+                              child: Text(
+                                chatMessages[index].substring(4), // Remove "You:" or "AI: "
+                                textAlign: TextAlign.left, // Align text to the left
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: wasteInputController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter waste item',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.send),
+                      onPressed: () async {
+                        String userInput = wasteInputController.text;
+                        if (userInput.isNotEmpty) {
+                          setState(() {
+                            chatMessages.add('You: $userInput');
+                          });
+
+                          // Send input to OpenRouter AI for breakdown and disposal info
+                          String response = await _getWasteGuideResponse(userInput);
+                          
+                          setState(() {
+                            chatMessages.add('AI: $response');
+                          });
+
+                          wasteInputController.clear();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+Future<String> _getWasteGuideResponse(String wasteItem) async {
+  const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+  const apiKey = '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';
+
+  final response = await http.post(
+    Uri.parse(apiUrl),
+    headers: {
+      'Authorization': 'Bearer $apiKey',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'model': 'liquid/lfm-40b:free',
+      'messages': [
+        {
+          'role': 'system',
+          'content': 'You are a waste guide assistant. Provide a breakdown of the specified waste item and information on how it can be disposed of in an eco-friendly manner.'
+        },
+        {
+          'role': 'user',
+          'content': 'Please provide a detailed breakdown and eco-friendly disposal methods for "$wasteItem".',
+        },
+      ],
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['choices'][0]['message']['content'];
+  } else {
+    print('Error: ${response.statusCode}');
+    return 'Error fetching response. Please try again later.';
+  }
+}
+
+
+
+void _showFoodGuide(BuildContext context) {
+  List<String> chatMessages = []; // Retain state for messages
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          TextEditingController foodInputController = TextEditingController();
+
+          return Container(
+            padding: EdgeInsets.all(16),
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Food Guide',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: chatMessages.length,
+                    itemBuilder: (context, index) {
+                      // Determine whether to show user or AI icon based on message
+                      bool isUserMessage = chatMessages[index].startsWith('You:');
+                      return ListTile(
+                        title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Check if the message is from the user or the AI
+                            if (isUserMessage)
+                              Icon(
+                                Icons.person,
+                                color: Colors.red,
+                                size: 24,
+                              )
+                            else
+                              SvgPicture.asset(
+                                'assets/icons/smart_toy.svg', // Path to your SVG icon
+                                width: 24,
+                                height: 24,
+                              ),
+                            SizedBox(width: 8), // Spacing between icon and text
+                            Expanded(
+                              child: Text(
+                                chatMessages[index].substring(4), // Remove "You:" or "AI: "
+                                textAlign: TextAlign.left, // Align text to the left
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: foodInputController,
+                        decoration: InputDecoration(
+                          hintText: 'Ask about healthy food',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.send),
+                      onPressed: () async {
+                        String userInput = foodInputController.text;
+                        if (userInput.isNotEmpty) {
+                          setState(() {
+                            chatMessages.add('You: $userInput');
+                          });
+
+                          // Send input to OpenRouter AI for healthy food advice
+                          String response = await _getFoodGuideResponse(userInput);
+                          
+                          setState(() {
+                            chatMessages.add('AI: $response');
+                          });
+
+                          foodInputController.clear();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+Future<String> _getFoodGuideResponse(String foodQuery) async {
+  const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+  const apiKey = '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'; // Replace with your actual API key
+
+  final response = await http.post(
+    Uri.parse(apiUrl),
+    headers: {
+      'Authorization': 'Bearer $apiKey',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'model': 'liquid/lfm-40b:free',
+      'messages': [
+        {
+          'role': 'system',
+          'content': 'You are a health guide assistant. Provide healthy food suggestions and nutritional advice based on user input.'
+        },
+        {
+          'role': 'user',
+          'content': 'Please give healthy food recommendations and nutritional guidance for: "$foodQuery".',
+        },
+      ],
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['choices'][0]['message']['content'];
+  } else {
+    print('Error: ${response.statusCode}');
+    return 'Error fetching response. Please try again later.';
+  }
+}
+
+  void _showBusinessDirectory(BuildContext context) {
+    List<String> chatMessages = [];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            TextEditingController productInputController = TextEditingController();
+
+            return Container(
+              padding: EdgeInsets.all(16),
+              color: Colors.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Business Directory',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: chatMessages.length,
+                      itemBuilder: (context, index) {
+                        bool isUserMessage = chatMessages[index].startsWith('You:');
+                        return ListTile(
+                          title: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (isUserMessage)
+                                Icon(
+                                  Icons.person,
+                                  color: Colors.red,
+                                  size: 24,
+                                )
+                              else
+                                SvgPicture.asset(
+                                  'assets/icons/smart_toy.svg', // Update the path if needed
+                                  width: 24,
+                                  height: 24,
+                                ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  chatMessages[index].substring(4),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: productInputController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter a product',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () async {
+                          String userInput = productInputController.text;
+                          if (userInput.isNotEmpty) {
+                            setState(() {
+                              chatMessages.add('You: $userInput');
+                            });
+
+                            String response = await _getBusinessDirectoryResponse(userInput);
+                            
+                            setState(() {
+                              chatMessages.add('AI: $response');
+                            });
+
+                            productInputController.clear();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showSustainableBot(BuildContext context) {
+    List<String> chatMessages = [];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            TextEditingController sustainabilityInputController = TextEditingController();
+
+            return Container(
+              padding: EdgeInsets.all(16),
+              color: Colors.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Sustainable Bot',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: chatMessages.length,
+                      itemBuilder: (context, index) {
+                        bool isUserMessage = chatMessages[index].startsWith('You:');
+                        return ListTile(
+                          title: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (isUserMessage)
+                                Icon(
+                                  Icons.person,
+                                  color: Colors.red,
+                                  size: 24,
+                                )
+                              else
+                                SvgPicture.asset(
+                                  'assets/icons/smart_toy.svg', // Update the path if needed
+                                  width: 24,
+                                  height: 24,
+                                ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  chatMessages[index].substring(4),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: sustainabilityInputController,
+                          decoration: InputDecoration(
+                            hintText: 'Ask about sustainability',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () async {
+                          String userInput = sustainabilityInputController.text;
+                          if (userInput.isNotEmpty) {
+                            setState(() {
+                              chatMessages.add('You: $userInput');
+                            });
+
+                            String response = await _getSustainableBotResponse(userInput);
+                            
+                            setState(() {
+                              chatMessages.add('AI: $response');
+                            });
+
+                            sustainabilityInputController.clear();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+Future<String> _getBusinessDirectoryResponse(String productName) async {
+    const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+    const apiKey = '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'; // Replace with your actual API key
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Authorization': 'Bearer $apiKey',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'model': 'liquid/lfm-40b:free',
+        'messages': [
+          {
+            'role': 'system',
+            'content': 'You are a business directory assistant. Suggest Sustaimable alternative companies that make similar products but more sustainable to promote the environment as requested.'
+          },
+          {
+            'role': 'user',
+            'content': 'Please provide alternative companies for: "$productName".',
+          },
+        ],
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['choices'][0]['message']['content']; // Assuming the response has this structure
+    } else {
+      return "Sorry, I couldn't find any alternatives.";
+    }
+  }
+
+  Future<String> _getSustainableBotResponse(String question) async {
+    const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+    const apiKey = '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'; // Replace with your actual API key
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Authorization': 'Bearer $apiKey',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'model': 'liquid/lfm-40b:free',
+        'messages': [
+          {
+            'role': 'system',
+            'content': 'You are a sustainability assistant. Answer questions related to sustainability practices and provide guidance based on user input.'
+          },
+          {
+            'role': 'user',
+            'content': 'Please provide information on sustainability for: "$question".',
+          },
+        ],
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['choices'][0]['message']['content']; // Assuming the response has this structure
+    } else {
+      return "I'm not sure about that.";
+    }
+  }
