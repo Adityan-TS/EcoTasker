@@ -1296,7 +1296,7 @@ void _openChatSheet(BuildContext context, String task) {
 // Modify _getChatResponse to accept task as a parameter
 Future<String> _getChatResponse(String query, String task) async {
   const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
-  const apiKey = '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'; // Replace with actual API key
+  const apiKey = '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';
 
   final response = await http.post(
     Uri.parse(apiUrl),
@@ -1366,7 +1366,7 @@ Future<String> _getChatResponse(String query, String task) async {
 void _navigateToLeaderboard() {
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => LeaderboardScreen()), // Replace LeaderboardScreen with your actual leaderboard screen widget
+    MaterialPageRoute(builder: (context) => LeaderboardScreen()),
   );
 }
 
@@ -1382,7 +1382,7 @@ void _navigateToLeaderboard() {
     builder: (context) {
       return DraggableScrollableSheet(
         expand: false,
-        initialChildSize: 0.9, // Takes up 80% of the screen height
+        initialChildSize: 0.9,
         minChildSize: 0.6,
         maxChildSize: 1.0,
         builder: (context, scrollController) {
@@ -1405,7 +1405,7 @@ void _navigateToLeaderboard() {
                   const SizedBox(height: 16),
                   Expanded(
                     child: ListView.builder(
-                      controller: scrollController, // Attach controller here
+                      controller: scrollController,
                       itemCount: requestedTasks.length,
                       itemBuilder: (context, index) {
                         return Card(
@@ -1443,7 +1443,7 @@ class LeaderboardScreen extends StatelessWidget {
   Future<List<Map<String, dynamic>>> _fetchLeaderboardData() async {
     final response = await Supabase.instance.client
         .from('Scores')
-        .select('"Email ID", Score') // Enclose "Email ID" in quotes if it has spaces
+        .select('"Email ID", Score')
         .order('Score', ascending: false)
         .limit(10);
 
