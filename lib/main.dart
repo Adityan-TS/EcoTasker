@@ -37,43 +37,84 @@ class EcoTasker extends StatelessWidget {
       title: 'EcoTasker',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.poppinsTextTheme(), // Set Poppins font
-        scaffoldBackgroundColor:
-            const Color(0xFF1A1A1A), // Set background color to hex #1a1a1a
+        textTheme: GoogleFonts.poppinsTextTheme(),
+        scaffoldBackgroundColor: const Color(0xFF1A1A1A),
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => FutureBuilder<bool>(
-              future: checkAuthStatus(), // Check authentication status
+        '/': (context) => FutureBuilder<Map<String, dynamic>?>( 
+              future: _getUserDetails(), // Fetch user details
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(
                       body: Center(child: CircularProgressIndicator()));
                 } else {
-                  if (snapshot.data == true) {
-                    return MyHomePage(
-                        title:
-                            ''); // User is logged in, show home page
-                  } else {
-                    return IntroScreen(
-                        supabaseClient:
-                            supabaseClient); // User not logged in, show intro screen
+                  if (snapshot.hasData) {
+                    final userDetails = snapshot.data;
+                    if (userDetails != null) {
+                      String accountType = userDetails['Type'] ?? 'Unknown';
+
+                      switch (accountType) {
+                        case 'Parent':
+                          return ParentDashboard(
+                            title: '',
+                            parentEmail: userDetails['StudentEmail'] ?? 'default@example.com',
+                          );
+                        case 'Eco Explorer':
+                          return const EcoExplorerScreen();
+                        case 'Student':
+                          return const MyHomePage(title: '');
+                        default:
+                          return IntroScreen(supabaseClient: supabaseClient);
+                      }
+                    }
                   }
+                  return IntroScreen(supabaseClient: supabaseClient);
                 }
               },
             ),
-        '/home': (context) => MyHomePage(title: ''),
-        // '/calendar': (context) => EventCalender()
+        '/home': (context) => const MyHomePage(title: ''),
       },
     );
   }
 
-  Future<bool> checkAuthStatus() async {
-    final user = supabaseClient.auth.currentUser;
-    return user !=
-        null; // Return true if user is authenticated, false otherwise
+Future<void> _checkUserDetails(BuildContext context) async {
+  final userDetails = await _getUserDetails();
+  if (userDetails != null) {
+    // Navigate to ParentDashboard after user login
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ParentDashboard(
+          title: 'Parent Dashboard',
+          parentEmail: userDetails['Email ID'], // Pass the parent email
+        ),
+      ),
+    );
   }
 }
+
+
+  Future<Map<String, dynamic>?> _getUserDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('userEmail');
+
+    if (email == null) {
+      print('No email found in SharedPreferences.');
+      return null; // No email found, not authenticated
+    }
+
+    final response = await supabaseClient
+        .from('Users')
+        .select('Type, StudentEmail')
+        .eq('Email ID', email)
+        .single();
+
+    print('User details fetched: $response'); // Debug log
+    return response as Map<String, dynamic>?; // Return user details
+  }
+}
+
 
 class IntroScreen extends StatefulWidget {
   final SupabaseClient supabaseClient;
@@ -956,7 +997,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'model': 'liquid/lfm-40b:free',
         'messages': [
           {
-            'role': 'A Task Generator That Generates Exactly 5 Tasks in A List that is numbered without any extra spaces or extra lines, The Tasks Must Be UAE Appropriate',
+            'role': 'A Task Generator That Generates Exactly 5 Tasks in A List that is numbered without any extra spaces or **EXTRA LINES IN BETWEEN THE TASKS**, The Tasks Must Be UAE Appropriate',
             'content': 'Generate EXACTLY 5 tasks which encourage 5-10 year olds to do something eco-friendly in a list preferably supporting SDG 13.',
           },
         ],
@@ -1157,80 +1198,93 @@ void _openChatSheet(BuildContext context, String task) {
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
-    isScrollControlled: true,
+    isScrollControlled: true, // Enable scrolling when keyboard opens
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            height: MediaQuery.of(context).size.height * 0.5,
-            color: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Chat about "$task"',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom, // Space for keyboard
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded corners
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                // Set height to a fraction of the screen height but allow it to expand when the keyboard is visible
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.6, // Maximum height
                 ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: chatMessages.length,
-                    itemBuilder: (context, index) {
-                      bool isUserMessage = chatMessages[index].startsWith('You:');
-                      return ListTile(
-                        title: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (isUserMessage)
-                              Icon(Icons.person, color: Colors.blue, size: 24)
-                            else
-                              Icon(Icons.smart_toy, color: Colors.green, size: 24),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                chatMessages[index].substring(4), // Removes "You:" or "AI:"
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Row(
+                color: Colors.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    Text(
+                      'Chat about "$task"',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 20),
+                    // Adjust the height of the ListView to take remaining space
                     Expanded(
-                      child: TextField(
-                        controller: chatInputController,
-                        decoration: const InputDecoration(
-                          hintText: 'Type your message...',
-                          border: OutlineInputBorder(),
-                        ),
+                      child: ListView.builder(
+                        itemCount: chatMessages.length,
+                        itemBuilder: (context, index) {
+                          bool isUserMessage = chatMessages[index].startsWith('You:');
+                          return ListTile(
+                            title: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (isUserMessage)
+                                  Icon(Icons.person, color: Colors.blue, size: 24)
+                                else
+                                  Icon(Icons.smart_toy, color: Colors.green, size: 24),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    chatMessages[index].substring(4), // Removes "You:" or "AI:"
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.send),
-                      onPressed: () async {
-                        String userInput = chatInputController.text;
-                        if (userInput.isNotEmpty) {
-                          setState(() {
-                            chatMessages.add('You: $userInput');
-                          });
+                    const SizedBox(height: 20), // Default spacing
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: chatInputController,
+                            decoration: const InputDecoration(
+                              hintText: 'Type your message...',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.send),
+                          onPressed: () async {
+                            String userInput = chatInputController.text;
+                            if (userInput.isNotEmpty) {
+                              setState(() {
+                                chatMessages.add('You: $userInput');
+                              });
 
-                          String response = await _getChatResponse(userInput, task); // Pass task here
-                          setState(() {
-                            chatMessages.add('AI: $response');
-                          });
+                              String response = await _getChatResponse(userInput, task); // Pass task here
+                              setState(() {
+                                chatMessages.add('AI: $response');
+                              });
 
-                          chatInputController.clear();
-                        }
-                      },
+                              chatInputController.clear();
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           );
         },
@@ -1255,7 +1309,7 @@ Future<String> _getChatResponse(String query, String task) async {
       'messages': [
         {
           'role': 'system',
-          'content': 'You are a helpful assistant providing insights and suggestions about the task: $task.'
+          'content': 'You are a helpful assistant providing insights and suggestions to teenagers about the task : $task.'
         },
         {
           'role': 'user',
@@ -1534,35 +1588,70 @@ class _ParentDashboardState extends State<ParentDashboard> {
   @override
   void initState() {
     super.initState();
-    _fetchChildEmail(widget.parentEmail);
+    _fetchParentEmail(); // Initiate fetch using _fetchParentEmail
   }
 
-  Future<void> _fetchChildEmail(String? parentEmail) async {
-    if (parentEmail != null && parentEmail.isNotEmpty) {
-      try {
-        final response = await Supabase.instance.client
-            .from('Users')
-            .select('StudentEmail')
-            .eq('Email ID', parentEmail)
-            .single();
+  Future<void> _fetchParentEmail() async {
+    String? parentEmail = widget.parentEmail.isNotEmpty
+        ? widget.parentEmail
+        : (await SharedPreferences.getInstance()).getString('userEmail');
 
-        if (response != null && response['StudentEmail'] != null) {
+    if (parentEmail != null && parentEmail.isNotEmpty) {
+      print("Parent email used for fetching child details: $parentEmail");
+      await _fetchChildEmail(parentEmail);
+    } else {
+      print('No valid parent email found.');
+    }
+  }
+
+Future<void> _fetchChildEmail(String parentEmail) async {
+  if (parentEmail.isNotEmpty) {
+    try {
+      // Fetch the account type and student email (if parent)
+      final response = await Supabase.instance.client
+          .from('Users')
+          .select('Type, StudentEmail')
+          .eq('Email ID', parentEmail)
+          .maybeSingle();
+
+      print('Fetched Account Type for parentEmail: $response');
+
+      if (response != null) {
+        // If account type is Student, set childEmail to parentEmail directly
+        if (response['Type'] == 'Student') {
+          setState(() {
+            childEmail = parentEmail;
+            childEmailPrefix = childEmail.split('@').first;
+            print('Set childEmail directly to: $childEmail');
+          });
+          await _fetchChildScore(childEmail);
+          await _fetchTaskRequests();
+          
+        // If account type is Parent, fetch and set the StudentEmail as childEmail
+        } else if (response['Type'] == 'Parent' && response['StudentEmail'] != null) {
           setState(() {
             childEmail = response['StudentEmail'];
             childEmailPrefix = childEmail.split('@').first;
+            print('Set childEmail from StudentEmail: $childEmail');
           });
-          _fetchChildScore(childEmail);
+          await _fetchChildScore(childEmail);
           await _fetchTaskRequests();
+          
         } else {
-          print('No child email found for the provided parent email.');
+          print('No associated StudentEmail found for the parent account.');
         }
-      } catch (error) {
-        print('Error fetching child email: $error');
+      } else {
+        print('No user found for the provided email.');
       }
-    } else {
-      print('Invalid parent email.');
+
+    } catch (error) {
+      print('Error fetching account type: $error');
     }
+  } else {
+    print('Invalid parent email.');
   }
+}
+
 
   Future<void> _fetchChildScore(String? email) async {
     if (email != null && email.isNotEmpty) {
@@ -2026,14 +2115,16 @@ class _EcoExplorerScreenState extends State<EcoExplorerScreen> {
   }
 
 
-  void _showBMICalculator(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Container(
+void _showBMICalculator(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
+            child: Container(
               padding: EdgeInsets.all(16),
               color: Colors.white,
               child: Column(
@@ -2130,150 +2221,151 @@ class _EcoExplorerScreenState extends State<EcoExplorerScreen> {
                   ),
                 ],
               ),
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
 
   void _showCarbonFootprintTracker(BuildContext context) {
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
+    isScrollControlled: true, // Enables full-screen height if needed
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          return Container(
-            padding: EdgeInsets.all(16),
-            color: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Carbon Footprint Tracker',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 20),
-
-                // Daily Commute Distance Input
-                Text('Daily Commute Distance (in km): ${commuteDistance.toStringAsFixed(2)}'),
-                Slider(
-                  value: commuteDistance,
-                  min: 0,
-                  max: 100,
-                  divisions: 100,
-                  label: commuteDistance.toStringAsFixed(2),
-                  activeColor: Color(0xFF227C70),
-                  onChanged: (value) {
-                    setState(() {
-                      commuteDistance = value;
-                    });
-                  },
-                ),
-
-                // Weekly Waste Generated Input
-                Text('Waste Generated per Week (in kg): ${wasteGenerated.toStringAsFixed(2)}'),
-                Slider(
-                  value: wasteGenerated,
-                  min: 0,
-                  max: 50,
-                  divisions: 100,
-                  label: wasteGenerated.toStringAsFixed(2),
-                  activeColor: Color(0xFF227C70),
-                  onChanged: (value) {
-                    setState(() {
-                      wasteGenerated = value;
-                    });
-                  },
-                ),
-
-                // Monthly Electricity Consumption Input
-                Text('Monthly Electricity Consumption (in kWh): ${electricityConsumption.toStringAsFixed(2)}'),
-                Slider(
-                  value: electricityConsumption,
-                  min: 0,
-                  max: 1000,
-                  divisions: 100,
-                  label: electricityConsumption.toStringAsFixed(2),
-                  activeColor: Color(0xFF227C70),
-                  onChanged: (value) {
-                    setState(() {
-                      electricityConsumption = value;
-                    });
-                  },
-                ),
-
-                // Meals Consumed per Day Input
-                Text('Meals Consumed per Day: ${mealsPerDay.toStringAsFixed(2)}'),
-                Slider(
-                  value: mealsPerDay,
-                  min: 0,
-                  max: 10,
-                  divisions: 10,
-                  label: mealsPerDay.toStringAsFixed(2),
-                  activeColor: Color(0xFF227C70),
-                  onChanged: (value) {
-                    setState(() {
-                      mealsPerDay = value;
-                    });
-                  },
-                ),
-                SizedBox(height: 20),
-                
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF227C70),
-                    foregroundColor: Colors.white,
+          return ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              height: MediaQuery.of(context).size.height * 0.8, // Increased height
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Carbon Footprint Tracker',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  onPressed: () {
-                    // Annual carbon footprint calculations in kg
-                    double commuteFootprint = commuteDistance * 365 * 0.404; // in kg
-                    double wasteFootprint = wasteGenerated * 52 * 1.0; // in kg
-                    double electricityFootprint = electricityConsumption * 12 * 0.5; // in kg
-                    double mealsFootprint = mealsPerDay * 365 * 0.75; // in kg
-                    
-                    // Convert each footprint to tonnes
-                    double commuteTonnes = commuteFootprint / 1000;
-                    double wasteTonnes = wasteFootprint / 1000;
-                    double electricityTonnes = electricityFootprint / 1000;
-                    double mealsTonnes = mealsFootprint / 1000;
+                  const SizedBox(height: 20),
 
-                    // Total carbon footprint in tonnes per year
-                    double totalFootprint = commuteTonnes + wasteTonnes + electricityTonnes + mealsTonnes;
+                  // Daily Commute Distance Input
+                  Text('Daily Commute Distance (in km): ${commuteDistance.toStringAsFixed(2)}'),
+                  Slider(
+                    value: commuteDistance,
+                    min: 0,
+                    max: 100,
+                    divisions: 100,
+                    label: commuteDistance.toStringAsFixed(2),
+                    activeColor: const Color(0xFF227C70),
+                    onChanged: (value) {
+                      setState(() {
+                        commuteDistance = value;
+                      });
+                    },
+                  ),
 
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Your Annual Carbon Footprint Breakdown'),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Commute: ${commuteTonnes.toStringAsFixed(2)} tonnes CO2/year'),
-                              Text('Waste: ${wasteTonnes.toStringAsFixed(2)} tonnes CO2/year'),
-                              Text('Electricity: ${electricityTonnes.toStringAsFixed(2)} tonnes CO2/year'),
-                              Text('Meals: ${mealsTonnes.toStringAsFixed(2)} tonnes CO2/year'),
-                              SizedBox(height: 10),
-                              Text('Total: ${totalFootprint.toStringAsFixed(2)} tonnes CO2/year'),
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('OK'),
+                  // Weekly Waste Generated Input
+                  Text('Waste Generated per Week (in kg): ${wasteGenerated.toStringAsFixed(2)}'),
+                  Slider(
+                    value: wasteGenerated,
+                    min: 0,
+                    max: 50,
+                    divisions: 100,
+                    label: wasteGenerated.toStringAsFixed(2),
+                    activeColor: const Color(0xFF227C70),
+                    onChanged: (value) {
+                      setState(() {
+                        wasteGenerated = value;
+                      });
+                    },
+                  ),
+
+                  // Monthly Electricity Consumption Input
+                  Text('Monthly Electricity Consumption (in kWh): ${electricityConsumption.toStringAsFixed(2)}'),
+                  Slider(
+                    value: electricityConsumption,
+                    min: 0,
+                    max: 1000,
+                    divisions: 100,
+                    label: electricityConsumption.toStringAsFixed(2),
+                    activeColor: const Color(0xFF227C70),
+                    onChanged: (value) {
+                      setState(() {
+                        electricityConsumption = value;
+                      });
+                    },
+                  ),
+
+                  // Meals Consumed per Day Input
+                  Text('Meals Consumed per Day: ${mealsPerDay.toStringAsFixed(2)}'),
+                  Slider(
+                    value: mealsPerDay,
+                    min: 0,
+                    max: 10,
+                    divisions: 10,
+                    label: mealsPerDay.toStringAsFixed(2),
+                    activeColor: const Color(0xFF227C70),
+                    onChanged: (value) {
+                      setState(() {
+                        mealsPerDay = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF227C70),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      // Carbon footprint calculations
+                      double commuteFootprint = commuteDistance * 365 * 0.404;
+                      double wasteFootprint = wasteGenerated * 52 * 1.0;
+                      double electricityFootprint = electricityConsumption * 12 * 0.5;
+                      double mealsFootprint = mealsPerDay * 365 * 0.75;
+
+                      // Convert to tonnes
+                      double totalFootprint = (commuteFootprint + wasteFootprint + electricityFootprint + mealsFootprint) / 1000;
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Your Annual Carbon Footprint Breakdown'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Commute: ${(commuteFootprint / 1000).toStringAsFixed(2)} tonnes CO2/year'),
+                                Text('Waste: ${(wasteFootprint / 1000).toStringAsFixed(2)} tonnes CO2/year'),
+                                Text('Electricity: ${(electricityFootprint / 1000).toStringAsFixed(2)} tonnes CO2/year'),
+                                Text('Meals: ${(mealsFootprint / 1000).toStringAsFixed(2)} tonnes CO2/year'),
+                                const SizedBox(height: 10),
+                                Text('Total: ${totalFootprint.toStringAsFixed(2)} tonnes CO2/year'),
+                              ],
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: Text('Calculate'),
-                ),
-              ],
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: const Text('Calculate'),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -2284,97 +2376,105 @@ class _EcoExplorerScreenState extends State<EcoExplorerScreen> {
 }
 
 void _showWasteGuide(BuildContext context) {
-  List<String> chatMessages = []; // Moved outside to retain state
+  List<String> chatMessages = [];
+  TextEditingController wasteInputController = TextEditingController();
 
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
+    isScrollControlled: true, // Enable scrolling when keyboard opens
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          TextEditingController wasteInputController = TextEditingController();
-
-          return Container(
-            padding: EdgeInsets.all(16),
-            color: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Waste Guide',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 20),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: chatMessages.length,
-                    itemBuilder: (context, index) {
-                      // Determine whether to show user or AI icon based on message
-                      bool isUserMessage = chatMessages[index].startsWith('You:');
-                      return ListTile(
-                        title: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Check if the message is from the user or the AI
-                            if (isUserMessage)
-                              Icon(
-                                Icons.person,
-                                color: Colors.red,
-                                size: 24,
-                              )
-                            else
-                              SvgPicture.asset(
-                                'assets/icons/smart_toy.svg', // Path to your SVG icon for AI
-                                width: 24,
-                                height: 24,
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom, // Space for keyboard
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded corners
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  height: MediaQuery.of(context).size.height * 0.5, // Adjust height if needed
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Waste Guide',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: chatMessages.length,
+                          itemBuilder: (context, index) {
+                            bool isUserMessage = chatMessages[index].startsWith('You:');
+                            return ListTile(
+                              title: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isUserMessage)
+                                    const Icon(
+                                      Icons.person,
+                                      color: Colors.red,
+                                      size: 24,
+                                    )
+                                  else
+                                    SvgPicture.asset(
+                                      'assets/icons/smart_toy.svg',
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      chatMessages[index].substring(4),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            SizedBox(width: 8), // Spacing between icon and text
-                            Expanded(
-                              child: Text(
-                                chatMessages[index].substring(4), // Remove "You:" or "AI: "
-                                textAlign: TextAlign.left, // Align text to the left
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: wasteInputController,
-                        decoration: InputDecoration(
-                          hintText: 'Enter waste item',
-                          border: OutlineInputBorder(),
+                            );
+                          },
                         ),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.send),
-                      onPressed: () async {
-                        String userInput = wasteInputController.text;
-                        if (userInput.isNotEmpty) {
-                          setState(() {
-                            chatMessages.add('You: $userInput');
-                          });
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: wasteInputController,
+                              decoration: const InputDecoration(
+                                hintText: 'Enter waste item',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.send),
+                            onPressed: () async {
+                              String userInput = wasteInputController.text;
+                              if (userInput.isNotEmpty) {
+                                setState(() {
+                                  chatMessages.add('You: $userInput');
+                                });
 
-                          // Send input to OpenRouter AI for breakdown and disposal info
-                          String response = await _getWasteGuideResponse(userInput);
-                          
-                          setState(() {
-                            chatMessages.add('AI: $response');
-                          });
+                                String response = await _getWasteGuideResponse(userInput);
+                                
+                                setState(() {
+                                  chatMessages.add('AI: $response');
+                                });
 
-                          wasteInputController.clear();
-                        }
-                      },
-                    ),
-                  ],
+                                wasteInputController.clear();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           );
         },
@@ -2382,6 +2482,7 @@ void _showWasteGuide(BuildContext context) {
     },
   );
 }
+
 
 Future<String> _getWasteGuideResponse(String wasteItem) async {
   const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
@@ -2420,97 +2521,105 @@ Future<String> _getWasteGuideResponse(String wasteItem) async {
 
 
 void _showFoodGuide(BuildContext context) {
-  List<String> chatMessages = []; // Retain state for messages
+  List<String> chatMessages = [];
+  TextEditingController foodInputController = TextEditingController();
 
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
+    isScrollControlled: true, // Enable scrolling when the keyboard is open
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          TextEditingController foodInputController = TextEditingController();
-
-          return Container(
-            padding: EdgeInsets.all(16),
-            color: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Food Guide',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 20),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: chatMessages.length,
-                    itemBuilder: (context, index) {
-                      // Determine whether to show user or AI icon based on message
-                      bool isUserMessage = chatMessages[index].startsWith('You:');
-                      return ListTile(
-                        title: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Check if the message is from the user or the AI
-                            if (isUserMessage)
-                              Icon(
-                                Icons.person,
-                                color: Colors.red,
-                                size: 24,
-                              )
-                            else
-                              SvgPicture.asset(
-                                'assets/icons/smart_toy.svg', // Path to your SVG icon
-                                width: 24,
-                                height: 24,
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom, // Space for keyboard
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  height: MediaQuery.of(context).size.height * 0.5, // Adjust height as needed
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Food Guide',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: chatMessages.length,
+                          itemBuilder: (context, index) {
+                            bool isUserMessage = chatMessages[index].startsWith('You:');
+                            return ListTile(
+                              title: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isUserMessage)
+                                    const Icon(
+                                      Icons.person,
+                                      color: Colors.red,
+                                      size: 24,
+                                    )
+                                  else
+                                    SvgPicture.asset(
+                                      'assets/icons/smart_toy.svg',
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      chatMessages[index].substring(4),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            SizedBox(width: 8), // Spacing between icon and text
-                            Expanded(
-                              child: Text(
-                                chatMessages[index].substring(4), // Remove "You:" or "AI: "
-                                textAlign: TextAlign.left, // Align text to the left
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: foodInputController,
-                        decoration: InputDecoration(
-                          hintText: 'Ask about healthy food',
-                          border: OutlineInputBorder(),
+                            );
+                          },
                         ),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.send),
-                      onPressed: () async {
-                        String userInput = foodInputController.text;
-                        if (userInput.isNotEmpty) {
-                          setState(() {
-                            chatMessages.add('You: $userInput');
-                          });
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: foodInputController,
+                              decoration: const InputDecoration(
+                                hintText: 'Ask about healthy food',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.send),
+                            onPressed: () async {
+                              String userInput = foodInputController.text;
+                              if (userInput.isNotEmpty) {
+                                setState(() {
+                                  chatMessages.add('You: $userInput');
+                                });
 
-                          // Send input to OpenRouter AI for healthy food advice
-                          String response = await _getFoodGuideResponse(userInput);
-                          
-                          setState(() {
-                            chatMessages.add('AI: $response');
-                          });
+                                String response = await _getFoodGuideResponse(userInput);
+                                
+                                setState(() {
+                                  chatMessages.add('AI: $response');
+                                });
 
-                          foodInputController.clear();
-                        }
-                      },
-                    ),
-                  ],
+                                foodInputController.clear();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           );
         },
@@ -2518,6 +2627,7 @@ void _showFoodGuide(BuildContext context) {
     },
   );
 }
+
 
 Future<String> _getFoodGuideResponse(String foodQuery) async {
   const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
@@ -2553,199 +2663,221 @@ Future<String> _getFoodGuideResponse(String foodQuery) async {
   }
 }
 
-  void _showBusinessDirectory(BuildContext context) {
-    List<String> chatMessages = [];
+void _showBusinessDirectory(BuildContext context) {
+  List<String> chatMessages = [];
+  TextEditingController productInputController = TextEditingController();
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            TextEditingController productInputController = TextEditingController();
-
-            return Container(
-              padding: EdgeInsets.all(16),
-              color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Business Directory',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 20),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: chatMessages.length,
-                      itemBuilder: (context, index) {
-                        bool isUserMessage = chatMessages[index].startsWith('You:');
-                        return ListTile(
-                          title: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (isUserMessage)
-                                Icon(
-                                  Icons.person,
-                                  color: Colors.red,
-                                  size: 24,
-                                )
-                              else
-                                SvgPicture.asset(
-                                  'assets/icons/smart_toy.svg', // Update the path if needed
-                                  width: 24,
-                                  height: 24,
-                                ),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  chatMessages[index].substring(4),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Row(
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true, // Enables scrolling with keyboard open
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom, // Space for keyboard
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  height: MediaQuery.of(context).size.height * 0.5, // Set height for sheet
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      const Text(
+                        'Business Directory',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
                       Expanded(
-                        child: TextField(
-                          controller: productInputController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter a product',
-                            border: OutlineInputBorder(),
-                          ),
+                        child: ListView.builder(
+                          itemCount: chatMessages.length,
+                          itemBuilder: (context, index) {
+                            bool isUserMessage = chatMessages[index].startsWith('You:');
+                            return ListTile(
+                              title: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isUserMessage)
+                                    const Icon(
+                                      Icons.person,
+                                      color: Colors.red,
+                                      size: 24,
+                                    )
+                                  else
+                                    SvgPicture.asset(
+                                      'assets/icons/smart_toy.svg',
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      chatMessages[index].substring(4),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: () async {
-                          String userInput = productInputController.text;
-                          if (userInput.isNotEmpty) {
-                            setState(() {
-                              chatMessages.add('You: $userInput');
-                            });
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: productInputController,
+                              decoration: const InputDecoration(
+                                hintText: 'Enter a product',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.send),
+                            onPressed: () async {
+                              String userInput = productInputController.text;
+                              if (userInput.isNotEmpty) {
+                                setState(() {
+                                  chatMessages.add('You: $userInput');
+                                });
 
-                            String response = await _getBusinessDirectoryResponse(userInput);
-                            
-                            setState(() {
-                              chatMessages.add('AI: $response');
-                            });
+                                String response = await _getBusinessDirectoryResponse(userInput);
+                                
+                                setState(() {
+                                  chatMessages.add('AI: $response');
+                                });
 
-                            productInputController.clear();
-                          }
-                        },
+                                productInputController.clear();
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
-  void _showSustainableBot(BuildContext context) {
-    List<String> chatMessages = [];
+void _showSustainableBot(BuildContext context) {
+  List<String> chatMessages = [];
+  TextEditingController sustainabilityInputController = TextEditingController();
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            TextEditingController sustainabilityInputController = TextEditingController();
-
-            return Container(
-              padding: EdgeInsets.all(16),
-              color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Sustainable Bot',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 20),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: chatMessages.length,
-                      itemBuilder: (context, index) {
-                        bool isUserMessage = chatMessages[index].startsWith('You:');
-                        return ListTile(
-                          title: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (isUserMessage)
-                                Icon(
-                                  Icons.person,
-                                  color: Colors.red,
-                                  size: 24,
-                                )
-                              else
-                                SvgPicture.asset(
-                                  'assets/icons/smart_toy.svg', // Update the path if needed
-                                  width: 24,
-                                  height: 24,
-                                ),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  chatMessages[index].substring(4),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Row(
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true, // Ensures the sheet is scrollable when keyboard appears
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom, // Adds space for keyboard
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  height: MediaQuery.of(context).size.height * 0.5, // Controls height
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      const Text(
+                        'Sustainable Bot',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
                       Expanded(
-                        child: TextField(
-                          controller: sustainabilityInputController,
-                          decoration: InputDecoration(
-                            hintText: 'Ask about sustainability',
-                            border: OutlineInputBorder(),
-                          ),
+                        child: ListView.builder(
+                          itemCount: chatMessages.length,
+                          itemBuilder: (context, index) {
+                            bool isUserMessage = chatMessages[index].startsWith('You:');
+                            return ListTile(
+                              title: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isUserMessage)
+                                    const Icon(
+                                      Icons.person,
+                                      color: Colors.red,
+                                      size: 24,
+                                    )
+                                  else
+                                    SvgPicture.asset(
+                                      'assets/icons/smart_toy.svg',
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      chatMessages[index].substring(4),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: () async {
-                          String userInput = sustainabilityInputController.text;
-                          if (userInput.isNotEmpty) {
-                            setState(() {
-                              chatMessages.add('You: $userInput');
-                            });
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: sustainabilityInputController,
+                              decoration: const InputDecoration(
+                                hintText: 'Ask about sustainability',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.send),
+                            onPressed: () async {
+                              String userInput = sustainabilityInputController.text;
+                              if (userInput.isNotEmpty) {
+                                setState(() {
+                                  chatMessages.add('You: $userInput');
+                                });
 
-                            String response = await _getSustainableBotResponse(userInput);
-                            
-                            setState(() {
-                              chatMessages.add('AI: $response');
-                            });
+                                String response = await _getSustainableBotResponse(userInput);
 
-                            sustainabilityInputController.clear();
-                          }
-                        },
+                                setState(() {
+                                  chatMessages.add('AI: $response');
+                                });
+
+                                sustainabilityInputController.clear();
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
 Future<String> _getBusinessDirectoryResponse(String productName) async {
     const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
